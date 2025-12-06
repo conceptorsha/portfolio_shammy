@@ -3,7 +3,7 @@
   const navToggle = document.querySelector('.nav-toggle');
   const nav = document.getElementById('main-nav');
   const navLinks = nav.querySelectorAll('a');
-  const ANCHOR_BREAKPOINT = 768;
+  const ANCHOR_BREAKPOINT = 850; // Match your CSS
 
   if (navToggle && nav) {
     function openMenu() {
@@ -21,9 +21,7 @@
       navToggle.setAttribute('aria-label', 'Open menu');
     }
     function toggleMenu() {
-      const isOpen = nav.classList.contains('open');
-      if (isOpen) closeMenu();
-      else openMenu();
+      nav.classList.contains('open') ? closeMenu() : openMenu();
     }
     navToggle.addEventListener('click', (e) => {
       e.stopPropagation();
@@ -57,32 +55,28 @@
   const yearEl = document.getElementById('year');
   if (yearEl) yearEl.textContent = new Date().getFullYear();
 
-  // SPA section logic (shows one section at a time)
-  const sections = document.querySelectorAll('.section');
-
-  function showSection(hash) {
-    let activeHash = hash || "#hero";
-    // If this hash doesn't match any section id, fallback to hero
-    if (!document.querySelector(activeHash)) activeHash = "#hero";
+  // Update nav active on scroll
+  const sections = document.querySelectorAll('section');
+  function updateActiveNavOnScroll() {
+    let currentSectionId = "hero";
+    let scrollPosition = window.scrollY + 90;
     sections.forEach(section => {
-      if ("#" + section.id === activeHash) {
-        section.classList.add('active-section');
-        section.style.display = "";
-      } else {
-        section.classList.remove('active-section');
-        section.style.display = "none";
+      if (section.offsetTop <= scrollPosition) {
+        currentSectionId = section.id;
       }
     });
     navLinks.forEach(link => {
-      if (link.getAttribute('href') === activeHash) link.classList.add('active');
+      if (link.getAttribute('href') === "#" + currentSectionId) link.classList.add('active');
       else link.classList.remove('active');
     });
   }
+  window.addEventListener('scroll', updateActiveNavOnScroll);
 
-  function initSection() {
-    showSection(location.hash || "#hero");
-  }
-
-  window.addEventListener('hashchange', () => showSection(location.hash));
-  document.addEventListener('DOMContentLoaded', initSection);
+  // Nav link click highlight
+  navLinks.forEach(link => {
+    link.addEventListener('click', function () {
+      navLinks.forEach(l => l.classList.remove('active'));
+      this.classList.add('active');
+    });
+  });
 })();
